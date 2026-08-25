@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Auditoría crítica del análisis, indicadores, código y dashboard</title>
+  <style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+  <style type="text/css">:root{
+--ink:#12303f;--ink2:#3d5866;--muted:#6a8494;--accent:#1a73b8;--accent2:#0f9d8f;
+--bg:#ffffff;--soft:#f6f9fb;--border:#d5dee5;--warn:#c8880c;--crit:#c0453c;
+--thbg:#1a73b8;--think:#ffffff;--quote-bg:#fbf6ec;--imgbg:#ffffff}
+@media (prefers-color-scheme:dark){
+:root:not([data-theme="light"]){
+--ink:#e8f0f4;--ink2:#c2d2db;--muted:#8ba4b0;--accent:#5aa9e6;--accent2:#3cc3b4;
+--bg:#0e1a20;--soft:#152730;--border:#28414d;--warn:#e0a92e;--crit:#e0655c;
+--thbg:#1c3a49;--think:#eaf2f6;--quote-bg:#1f2b1c;--imgbg:#f2f5f7}
+}
+:root[data-theme="dark"]{
+--ink:#e8f0f4;--ink2:#c2d2db;--muted:#8ba4b0;--accent:#5aa9e6;--accent2:#3cc3b4;
+--bg:#0e1a20;--soft:#152730;--border:#28414d;--warn:#e0a92e;--crit:#e0655c;
+--thbg:#1c3a49;--think:#eaf2f6;--quote-bg:#1f2b1c;--imgbg:#f2f5f7}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{max-width:860px;margin:0 auto;padding:48px 28px 80px;background:var(--bg);color:var(--ink);
+font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.62;font-size:16px;
+transition:background .2s,color .2s}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;text-wrap:balance;margin:1.8em 0 .5em}
+h1{font-size:2em;border-bottom:3px solid var(--accent);padding-bottom:.3em;margin-top:0}
+h2{font-size:1.4em;color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:.2em}
+h3{font-size:1.12em;color:var(--ink)}
+p{margin:.6em 0}
+.subtitle,header.title-block,#TOC .toc-title{color:var(--muted)}
+#TOC,nav#TOC{background:var(--soft);border:1px solid var(--border);border-radius:8px;padding:10px 20px;margin:1.2em 0}
+#TOC a{color:var(--accent);text-decoration:none}
+.cover-meta{background:var(--soft);border:1px solid var(--border);border-left:4px solid var(--accent);
+border-radius:8px;padding:16px 20px;font-size:.95em;margin:1.2em 0}
+blockquote{border-left:4px solid var(--warn);background:var(--quote-bg);margin:1.4em 0;padding:12px 18px;
+border-radius:0 8px 8px 0;color:var(--ink2);font-size:.95em}
+table{border-collapse:collapse;width:100%;margin:1.2em 0;font-size:.88em;display:block;overflow-x:auto}
+th,td{border:1px solid var(--border);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--thbg);color:var(--think);font-weight:600}
+tr:nth-child(even) td{background:var(--soft)}
+img{max-width:100%;height:auto;display:block;margin:1.2em auto;background:var(--imgbg);
+border:1px solid var(--border);border-radius:8px;padding:4px}
+code{background:var(--soft);padding:1px 5px;border-radius:4px;font-family:"IBM Plex Mono",monospace;font-size:.9em}
+strong{color:var(--ink)}
+hr{border:none;border-top:1px solid var(--border);margin:2em 0}
+a{color:var(--accent)}
+#themeToggle{position:fixed;top:16px;right:16px;z-index:50;border:1px solid var(--border);
+background:var(--soft);color:var(--ink);border-radius:20px;padding:8px 14px;font-size:13px;cursor:pointer;
+font-family:inherit;box-shadow:0 1px 4px rgba(0,0,0,.12);transition:all .2s}
+#themeToggle:hover{border-color:var(--accent);color:var(--accent)}
+@media(max-width:600px){body{padding:56px 14px 60px}#themeToggle{top:10px;right:10px;padding:6px 11px}}
+@media print{#themeToggle{display:none}}
+</style>
+</head>
+<body>
+<button id="themeToggle" onclick="__toggleTheme()" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<script>
+(function(){
+  try{var t=localStorage.getItem('cesfam-theme'); if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}
+})();
+function __toggleTheme(){
+  var r=document.documentElement;
+  var cur=r.getAttribute('data-theme');
+  if(!cur){cur=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}
+  var next=cur==='dark'?'light':'dark';
+  r.setAttribute('data-theme',next);
+  try{localStorage.setItem('cesfam-theme',next);}catch(e){}
+}
+</script>
+<header id="title-block-header">
+<h1 class="title">Auditoría crítica del análisis, indicadores, código y
+dashboard</h1>
+<p class="subtitle">CESFAM Tongoy — verificación de 25 puntos y versión
+corregida</p>
+<p class="date">Agosto 2026</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<h2 id="toc-title">Contenido</h2>
+<ul>
+<li><a href="#propósito-y-método-de-la-auditoría" id="toc-propósito-y-método-de-la-auditoría">Propósito y método de la
+auditoría</a></li>
+<li><a href="#resultado-de-la-verificación-automatizada" id="toc-resultado-de-la-verificación-automatizada">Resultado de la
+verificación automatizada</a></li>
+<li><a href="#auditoría-por-punto" id="toc-auditoría-por-punto">Auditoría por punto</a></li>
+<li><a href="#síntesis-de-severidad" id="toc-síntesis-de-severidad">Síntesis de severidad</a></li>
+</ul>
+</nav>
+<h1 id="propósito-y-método-de-la-auditoría">Propósito y método de la
+auditoría</h1>
+<p>Este documento audita críticamente el análisis, los indicadores, los
+gráficos, el código Python, el JSON y el dashboard HTML producidos para
+el CESFAM Tongoy. Para cada uno de los 25 puntos solicitados se indica
+<strong>ubicación</strong>, <strong>descripción</strong>,
+<strong>riesgo</strong>, <strong>corrección aplicada o
+propuesta</strong>, la <strong>severidad</strong> (Crítico / Alto /
+Moderado / Bajo) y su <strong>estado</strong> (Resuelto / Mitigado /
+Limitación estructural). La auditoría se ejecutó de forma automatizada
+(verificación headless del dashboard: KPIs, número de gráficos
+renderizados, errores de consola y respuesta de filtros) y por revisión
+de las cifras cruzando informe, JSON y panel.</p>
+<p><strong>Convención de estado.</strong> <em>Resuelto</em>: corregido
+en los entregables finales. <em>Mitigado</em>: no eliminable con los
+datos disponibles, pero acotado y advertido. <em>Limitación
+estructural</em>: depende de datos que la base no contiene.</p>
+<hr />
+<h1 id="resultado-de-la-verificación-automatizada">Resultado de la
+verificación automatizada</h1>
+<ul>
+<li><strong>Coherencia de cifras informe ↔︎ dashboard:</strong> KPIs del
+panel = 136.746 registros / 185.500 prestaciones / 69.468 atenciones /
+9.999 personas → <strong>idénticos</strong> a los del informe. ✔</li>
+<li><strong>Gráficos interactivos:</strong> 17 lienzos (canvas)
+renderizados sin error de JavaScript. ✔</li>
+<li><strong>Filtros:</strong> al filtrar por estamento “Odontología”,
+registros pasan de 136.746 a 27.232 y todos los KPIs y gráficos se
+recalculan. ✔</li>
+<li><strong>Errores de consola:</strong> solo la carga de la fuente de
+Google cuando no hay red (usa tipografía de respaldo del sistema). Sin
+impacto funcional. ✔</li>
+<li><strong>Tamaño:</strong> 7,7 MB, dentro del límite; abre sin
+conexión. ✔</li>
+</ul>
+<hr />
+<h1 id="auditoría-por-punto">Auditoría por punto</h1>
+<h3 id="coherencia-entre-cifras-del-informe-y-del-dashboard-bajo-resuelto">1.
+Coherencia entre cifras del informe y del dashboard — <strong>Bajo ·
+Resuelto</strong></h3>
+<p><strong>Ubicación:</strong> <code>resultados.json</code>,
+<code>dashboard/data.json</code>, KPIs del panel.
+<strong>Descripción:</strong> ambos artefactos se generan del mismo
+pickle limpio y del mismo subconjunto de período; se verificó igualdad
+exacta de los cuatro totales. <strong>Riesgo:</strong> divergencia de
+cifras entre documentos. <strong>Corrección:</strong> fuente única de
+datos; verificación headless que compara KPIs. Estado: sin
+discrepancias.</p>
+<h3 id="interpretación-de-la-variable-años-edad-a-la-atención-crítico-potencial-resuelto">2.
+Interpretación de la variable “Año(s)” (Edad a la Atención) —
+<strong>Crítico (potencial) · Resuelto</strong></h3>
+<p><strong>Ubicación:</strong> <code>01_limpieza.py</code> (bloque
+edad). <strong>Descripción:</strong> se confirmó que “Edad a la
+Atención” es la <strong>edad en años</strong> al momento de la atención
+(no un año calendario), coherente con “Meses/Días a la Atención” y con
+el rango observado (0–113). No se asumió a priori.
+<strong>Riesgo:</strong> confundir edad con año habría invalidado todo
+el análisis etario. <strong>Corrección:</strong> verificación por rango,
+coherencia entre columnas y contexto; se usa como dato
+<strong>observado</strong>.</p>
+<h3 id="interpretación-de-meses-y-días-moderado-resuelto">3.
+Interpretación de “Mes(es)” y “Día(s)” — <strong>Moderado ·
+Resuelto</strong></h3>
+<p><strong>Ubicación:</strong> ídem. <strong>Descripción:</strong>
+“Meses a la Atención” (0–11) y “Días a la Atención” (0–33) complementan
+la edad (p. ej., 5 años 9 meses en lactantes/preescolares). No se usan
+como mes/día calendario. <strong>Riesgo:</strong> duplicar o
+malinterpretar la dimensión temporal. <strong>Corrección:</strong> la
+fecha calendario se toma solo de “Fecha/Hora Atención”; los meses/días
+de edad no se mezclan con el calendario.</p>
+<h3 id="validez-del-cálculo-de-edad-bajo-resueltomitigado">4. Validez
+del cálculo de edad — <strong>Bajo · Resuelto/Mitigado</strong></h3>
+<p><strong>Descripción:</strong> edad tomada directamente del campo
+observado (no recalculada por falta de fecha de nacimiento, que además
+es PII no utilizada). 4 casos &gt; 110 años se <strong>marcan</strong>
+como sospechosos y se conservan (no se imputan ni eliminan).
+<strong>Riesgo:</strong> sesgo por edades imposibles.
+<strong>Corrección:</strong> flag <code>edad&gt;110</code>; análisis
+etario robusto a 4 casos sobre 145.478.</p>
+<h3 id="tratamiento-de-registros-duplicados-moderado-mitigado">5.
+Tratamiento de registros duplicados — <strong>Moderado ·
+Mitigado</strong></h3>
+<p><strong>Ubicación:</strong> <code>02_calidad.py</code>.
+<strong>Descripción:</strong> 180 duplicados exactos (0,12%) y 403
+prestaciones repetidas dentro de una misma atención. <strong>No se
+eliminan</strong> para no perder actividad legítima; se documentan y se
+recomienda regla de deduplicación en origen. <strong>Riesgo:</strong>
+leve sobreconteo. <strong>Corrección:</strong> cuantificados y
+reportados; impacto &lt; 0,3%.</p>
+<h3 id="tratamiento-de-valores-faltantes-alto-mitigado">6. Tratamiento
+de valores faltantes — <strong>Alto · Mitigado</strong></h3>
+<p><strong>Descripción:</strong> no se imputan datos
+clínicos/demográficos. Faltantes → categoría “No informado”, visible en
+gráficos y tablas. Se distingue observado/derivado/excluido.
+<strong>Riesgo:</strong> ocultar la incompletitud o sesgar por
+imputación. <strong>Corrección:</strong> “No informado” es categoría
+explícita; el panel la muestra (no la esconde).</p>
+<h3 id="errores-de-fechas-y-horarios-alto-resueltomitigado">7. Errores
+de fechas y horarios — <strong>Alto · Resuelto/Mitigado</strong></h3>
+<p><strong>Descripción:</strong> 8.732 registros de julio-2026 (fuera de
+período) se excluyen del análisis principal y se reportan aparte; 255
+registros en madrugada (00–06 h) y 1 con hora 00:00 exacta se marcan.
+<strong>Riesgo:</strong> contaminar el período o el análisis horario.
+<strong>Corrección:</strong> flag <code>fuera_periodo</code>;
+subconjunto de período para todo el análisis y el dashboard.</p>
+<h3 id="duraciones-negativas-o-imposibles-alto-mitigado">8. Duraciones
+negativas o imposibles — <strong>Alto · Mitigado</strong></h3>
+<p><strong>Descripción:</strong> 7,6% de atenciones con cierre anterior
+al inicio y 21% &gt; 4 h, porque el cierre es del bloque, no de la
+prestación. La duración se calcula <strong>solo a nivel de
+atención</strong> y válida en 0–240 min; el resto se excluye del cálculo
+(no se imputa). <strong>Riesgo:</strong> medias de duración infladas o
+negativas. <strong>Corrección:</strong> rango de validez explícito; se
+usa <strong>mediana</strong> (40 min) sobre 70,8% de atenciones válidas
+y se advierte la limitación.</p>
+<h3 id="registros-vs.-personas-vs.-atenciones-vs.-prestaciones-crítico-conceptual-resuelto">9.
+Registros vs. personas vs. atenciones vs. prestaciones — <strong>Crítico
+(conceptual) · Resuelto</strong></h3>
+<p><strong>Descripción:</strong> los cuatro niveles se definen y
+cuantifican por separado en todo el informe, el JSON y los KPIs del
+panel. Se advierte que IDKEY (anonimizado) <strong>no equivale a
+población inscrita</strong>. <strong>Riesgo:</strong> confundir
+producción con personas atendidas. <strong>Corrección:</strong>
+diccionario de variables + KPIs separados; regla explícita “no confundir
+registros con personas”.</p>
+<h3 id="uso-de-porcentajes-y-denominadores-alto-mitigado">10. Uso de
+porcentajes y denominadores — <strong>Alto · Mitigado</strong></h3>
+<p><strong>Descripción:</strong> los porcentajes se reportan con su
+base; se evita usar denominadores poblacionales inexistentes. Las
+participaciones internas se rotulan como tales, no como tasas.
+<strong>Riesgo:</strong> presentar participaciones como tasas
+poblacionales. <strong>Corrección:</strong> advertencia repetida; se
+excluye “No informado” del ranking de programa/sector pero se informa su
+magnitud.</p>
+<h3 id="sesgos-de-interpretación-alto-mitigado">11. Sesgos de
+interpretación — <strong>Alto · Mitigado</strong></h3>
+<p><strong>Descripción:</strong> posible sesgo de registro (lo no
+registrado no aparece) y de disponibilidad (bloques sin oferta parecen
+sin demanda). Se explicita en §7 (focos inversos) al separar demanda
+real / oferta / subregistro / mala codificación.
+<strong>Riesgo:</strong> leer “menos registros” como “menos necesidad”.
+<strong>Corrección:</strong> advertencias específicas; nivel de
+confianza por hallazgo.</p>
+<h3 id="conclusiones-causales-no-justificadas-alto-resuelto">12.
+Conclusiones causales no justificadas — <strong>Alto ·
+Resuelto</strong></h3>
+<p><strong>Descripción:</strong> estacionalidad, barreras horarias por
+trabajo/escuela y variaciones semestrales se presentan como
+<strong>hipótesis</strong>, nunca como causas. La asociación
+Programa×Estamento (V de Cramér) se advierte como no causal.
+<strong>Riesgo:</strong> inferir causalidad de datos observacionales.
+<strong>Corrección:</strong> lenguaje de hipótesis; regla “asociación ≠
+causalidad”.</p>
+<h3 id="identificación-de-horarios-punta-y-valle-bajo-resuelto">13.
+Identificación de horarios punta y valle — <strong>Bajo ·
+Resuelto</strong></h3>
+<p><strong>Descripción:</strong> punta absoluta martes 09–11 h (celda
+12.023) y hora 11:00; valle vespertino 18–20 h. Verificado contra el
+JSON y el mapa de calor. <strong>Riesgo:</strong> designar mal los
+bloques. <strong>Corrección:</strong> cálculo reproducible; coincide
+informe/panel.</p>
+<h3 id="calidad-del-análisis-día-hora-bajo-resuelto">14. Calidad del
+análisis día × hora — <strong>Bajo · Resuelto</strong></h3>
+<p><strong>Descripción:</strong> matriz 7×24 completa, sin celdas vacías
+espurias (las celdas de fin de semana/nocturnas están correctamente en
+~0). Mapa de calor con escala secuencial de un solo tono (válida para
+magnitud). <strong>Riesgo:</strong> artefactos visuales o celdas
+faltantes. <strong>Corrección:</strong> reindexación explícita de días y
+horas 0–23.</p>
+<h3 id="calidad-del-análisis-edad-horario-moderado-mitigado">15. Calidad
+del análisis edad × horario — <strong>Moderado · Mitigado</strong></h3>
+<p><strong>Descripción:</strong> cruce curso de vida × hora normalizado
+<strong>por fila</strong> (% dentro de cada grupo), lo que evita que los
+grupos más numerosos dominen la lectura. Se interpreta con hipótesis, no
+con causas. <strong>Riesgo:</strong> confundir volumen con patrón
+horario. <strong>Corrección:</strong> normalización por fila documentada
+en el gráfico y el código.</p>
+<h3 id="coherencia-de-los-filtros-moderado-resuelto">16. Coherencia de
+los filtros — <strong>Moderado · Resuelto</strong></h3>
+<p><strong>Ubicación:</strong> <code>_template.html</code> (motor de
+filtrado). <strong>Descripción:</strong> 13 dimensiones de filtro; todos
+actualizan de forma coherente KPIs, series, mapas y Pareto sobre el
+mismo conjunto filtrado. “Personas” y “atenciones” se recalculan como
+únicos bajo filtro. <strong>Riesgo:</strong> que un gráfico ignore un
+filtro. <strong>Corrección:</strong> un único índice filtrado alimenta
+todas las agregaciones; verificado headless.</p>
+<h3 id="funcionamiento-de-los-gráficos-interactivos-bajo-resuelto">17.
+Funcionamiento de los gráficos interactivos — <strong>Bajo ·
+Resuelto</strong></h3>
+<p><strong>Descripción:</strong> 17 gráficos ECharts con tooltip; sin
+errores de consola; botón “Limpiar filtros”, alternador de tema y
+descarga CSV (capacidad <code>downloads</code> en el Artifact, Blob en
+el archivo offline) operativos. <strong>Riesgo:</strong> botones inertes
+o gráficos en blanco. <strong>Corrección:</strong> verificación
+automatizada; descarga con reintento <code>.txt</code> si el visor no
+habilita <code>.csv</code>.</p>
+<h3 id="responsividad-del-html-bajo-resuelto">18. Responsividad del HTML
+— <strong>Bajo · Resuelto</strong></h3>
+<p><strong>Descripción:</strong> grilla de 12 columnas que colapsa a una
+columna bajo 920 px; barra lateral que pasa a superior; gráficos con
+<code>resize</code>. Contenedores con <code>overflow</code> para no
+desbordar el cuerpo. <strong>Riesgo:</strong> desborde horizontal en
+móvil. <strong>Corrección:</strong> <em>media query</em> y
+<code>chart.resize()</code> en <code>resize</code>.</p>
+<h3 id="accesibilidad-visual-moderado-mitigado">19. Accesibilidad visual
+— <strong>Moderado · Mitigado</strong></h3>
+<p><strong>Descripción:</strong> paleta categórica <strong>validada para
+daltonismo</strong> (separación CVD ΔE ≥ 8; validador ejecutado). Modos
+claro y oscuro definidos por tokens. Identidad nunca solo por color:
+leyendas y etiquetas directas. El ámbar tiene bajo contraste sobre
+superficie, mitigado con etiquetas visibles. <strong>Riesgo:</strong>
+ilegibilidad para visión con deficiencia de color o en un tema.
+<strong>Corrección:</strong> validación con script; segundo codificado
+(texto) presente.</p>
+<h3 id="exposición-de-información-sensible-crítico-resuelto">20.
+Exposición de información sensible — <strong>Crítico ·
+Resuelto</strong></h3>
+<p><strong>Descripción:</strong> se eliminaron nombre del profesional,
+documento, nombre del paciente y comentario libre <strong>antes</strong>
+del análisis; IDKEY convertido en hash irreversible y <strong>nunca
+mostrado</strong>; ninguna salida contiene identificadores. El CSV
+descargable no incluye PII. Sin recuentos de celdas que permitan
+reidentificación directa. <strong>Riesgo:</strong> reidentificación /
+incumplimiento de la Ley 19.628. <strong>Corrección:</strong>
+anonimización en origen; análisis por estamento, no por persona;
+advertencia de almacenamiento seguro.</p>
+<h3 id="consistencia-con-el-contexto-de-aps-en-chile-bajo-resuelto">21.
+Consistencia con el contexto de APS en Chile — <strong>Bajo ·
+Resuelto</strong></h3>
+<p><strong>Descripción:</strong> lectura bajo el Modelo de Atención
+Integral de Salud Familiar y Comunitaria (MAIS), enfoque de curso de
+vida, gestión por programas y distinción
+producción/cobertura/productividad. Coherente con un CESFAM con posta
+rural y urgencia rural acotada. <strong>Riesgo:</strong> interpretación
+descontextualizada. <strong>Corrección:</strong> marco MAIS y curso de
+vida aplicados; sin afirmar metas que la base no contiene.</p>
+<h3 id="uso-correcto-y-verificable-de-normas-técnicas-chilenas-alto-mitigado">22.
+Uso correcto y verificable de normas técnicas chilenas — <strong>Alto ·
+Mitigado</strong></h3>
+<p><strong>Descripción:</strong> se citan solo referencias
+<strong>verificables y estables</strong>: el Modelo MAIS (MINSAL) y la
+<strong>Ley N.º 19.628 sobre Protección de la Vida Privada</strong>
+(datos personales). <strong>No se inventan</strong> circulares, metas
+IAAPS/REM ni códigos. Cuando una norma específica (p. ej. metas de un
+programa) no puede verificarse a 2026, <strong>no se afirma</strong>.
+<strong>Riesgo:</strong> citar normas inexistentes o desactualizadas.
+<strong>Corrección:</strong> se evita nombrar normativa no verificada;
+se recomienda al equipo validar metas locales vigentes con la fuente
+oficial (MINSAL / Servicio de Salud Coquimbo).</p>
+<h3 id="reproducibilidad-del-código-bajo-resuelto">23. Reproducibilidad
+del código — <strong>Bajo · Resuelto</strong></h3>
+<p><strong>Descripción:</strong> pipeline modular (6 scripts numerados),
+salidas intermedias en disco, sin rutas ni credenciales sensibles,
+<code>README</code> con orden de ejecución. Corre de principio a fin
+regenerando JSON, CSV, gráficos y dashboard. <strong>Riesgo:</strong> no
+poder reproducir los resultados. <strong>Corrección:</strong> scripts
+versionados y ordenados; datos derivados separados de los
+originales.</p>
+<h3 id="manejo-de-columnas-inexistentes-moderado-mitigado">24. Manejo de
+columnas inexistentes — <strong>Moderado · Mitigado</strong></h3>
+<p><strong>Descripción:</strong> la limpieza filtra PII con comprensión
+condicional (<code>[c for c in PII if c in df.columns]</code>) y las
+dimensiones opcionales se rellenan a “No informado”. El nombre real
+difiere del “esperado” del enunciado (p. ej. “Edad a la Atención” en vez
+de “Año(s)”): se documentó el mapeo y el código no asume nombres
+ausentes. <strong>Riesgo:</strong> caída si cambia el esquema.
+<strong>Corrección:</strong> acceso tolerante; se recomienda añadir un
+normalizador de nombres si la fuente varía entre extracciones.</p>
+<h3 id="claridad-de-las-recomendaciones-bajo-resuelto">25. Claridad de
+las recomendaciones — <strong>Bajo · Resuelto</strong></h3>
+<p><strong>Descripción:</strong> cada recomendación (Tabla 13.1) indica
+problema que aborda, responsable sugerido, prioridad, horizonte e
+indicador de seguimiento, y está vinculada a un hallazgo con evidencia.
+<strong>Riesgo:</strong> recomendaciones genéricas o no accionables.
+<strong>Corrección:</strong> formato
+problema→acción→responsable→indicador.</p>
+<hr />
+<h1 id="síntesis-de-severidad">Síntesis de severidad</h1>
+<table>
+<thead>
+<tr class="header">
+<th>Severidad</th>
+<th>Puntos</th>
+<th>Estado predominante</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Crítico</strong></td>
+<td>2, 9, 20 (y 1 potencial)</td>
+<td>Resuelto</td>
+</tr>
+<tr class="even">
+<td><strong>Alto</strong></td>
+<td>6, 7, 8, 10, 11, 12, 22</td>
+<td>Resuelto / Mitigado</td>
+</tr>
+<tr class="odd">
+<td><strong>Moderado</strong></td>
+<td>3, 5, 15, 16, 19, 24</td>
+<td>Resuelto / Mitigado</td>
+</tr>
+<tr class="even">
+<td><strong>Bajo</strong></td>
+<td>1, 4, 13, 14, 17, 18, 21, 23, 25</td>
+<td>Resuelto</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Limitaciones estructurales que persisten</strong> (no
+corregibles con esta base): ausencia de denominadores poblacionales y de
+dotación horaria (impide tasas y productividad), subregistro de
+Programa/Sector en el origen, y registro horario de cierre a nivel de
+bloque. Las tres requieren intervención en el sistema de registro, no en
+el análisis.</p>
+<p><strong>Conclusión de la auditoría.</strong> Los entregables finales
+(informe, dashboard, código, JSON y CSV) <strong>incorporan las
+correcciones</strong> de los puntos resueltos y <strong>acotan y
+advierten</strong> los mitigados. No se detectaron exposiciones de
+información sensible ni incoherencias de cifras entre informe y
+dashboard. La versión aquí entregada es la versión corregida y
+mejorada.</p>
+</body>
+</html>
