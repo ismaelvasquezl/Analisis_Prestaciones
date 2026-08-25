@@ -1,0 +1,479 @@
+<title>Producción CESFAM Tongoy</title>
+<style>
+:root{
+  --bg:#eef2f5; --surface:#ffffff; --surface-2:#f6f9fb; --border:#d5dee5;
+  --ink:#12303f; --ink-2:#3d5866; --muted:#6a8494; --accent:#1a73b8; --accent-2:#0f9d8f;
+  --good:#2a8f5a; --warn:#c8880c; --crit:#c0453c; --shadow:0 1px 3px rgba(18,48,63,.08),0 1px 2px rgba(18,48,63,.06);
+  --c0:#1a73b8;--c1:#e8990c;--c2:#0f9d8f;--c3:#d1453a;--c4:#8f57cf;--c5:#6f9430;
+  --grid:#e6edf1;
+}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme:dark){
+ :root:not([data-theme="light"]){
+  --bg:#0e1a20; --surface:#152730; --surface-2:#1b303a; --border:#28414d;
+  --ink:#e8f0f4; --ink-2:#b3c6d0; --muted:#7e97a3; --accent:#4aa3e0; --accent-2:#3cc3b4;
+  --good:#4bbd7f; --warn:#e0a92e; --crit:#e0655c; --shadow:0 1px 3px rgba(0,0,0,.4);
+  --c0:#4aa3e0;--c1:#f0b64a;--c2:#3cc3b4;--c3:#e0655c;--c4:#b083e0;--c5:#93b85a;
+  --grid:#243a45;
+ }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1a20; --surface:#152730; --surface-2:#1b303a; --border:#28414d;
+  --ink:#e8f0f4; --ink-2:#b3c6d0; --muted:#7e97a3; --accent:#4aa3e0; --accent-2:#3cc3b4;
+  --good:#4bbd7f; --warn:#e0a92e; --crit:#e0655c; --shadow:0 1px 3px rgba(0,0,0,.4);
+  --c0:#4aa3e0;--c1:#f0b64a;--c2:#3cc3b4;--c3:#e0655c;--c4:#b083e0;--c5:#93b85a;
+  --grid:#243a45;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.mono{font-family:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;text-wrap:balance;font-weight:600}
+a{color:var(--accent)}
+.wrap{display:grid;grid-template-columns:290px 1fr;min-height:100vh}
+/* Sidebar */
+.side{background:var(--surface);border-right:1px solid var(--border);padding:18px 16px;
+  position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.brand .dot{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px;flex:none}
+.brand h1{font-size:15px;letter-spacing:.2px}
+.brand span{font-size:11px;color:var(--muted);letter-spacing:.4px;text-transform:uppercase}
+.side .sub{font-size:12px;color:var(--muted);margin:2px 0 14px}
+.fbar{display:flex;gap:8px;margin-bottom:12px}
+.btn{flex:1;border:1px solid var(--border);background:var(--surface-2);color:var(--ink-2);
+  border-radius:8px;padding:8px 10px;font-size:12px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.fgroup{border-top:1px solid var(--border);padding:10px 0}
+.fgroup>.h{display:flex;justify-content:space-between;align-items:center;cursor:pointer;
+  font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-2)}
+.fgroup>.h .cnt{font-size:10px;color:var(--muted);font-weight:500}
+.fgroup .opts{margin-top:8px;max-height:190px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.fgroup.collapsed .opts{display:none}
+.opt{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:3px 4px;border-radius:5px;cursor:pointer;color:var(--ink-2)}
+.opt:hover{background:var(--surface-2)}
+.opt input{accent-color:var(--accent);margin:0}
+.opt .n{margin-left:auto;font-size:11px;color:var(--muted)}
+/* Main */
+.main{padding:22px 26px 60px;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:6px}
+.top h2{font-size:20px}
+.top p{margin:4px 0 0;color:var(--muted);font-size:13px;max-width:70ch}
+.theme-t{border:1px solid var(--border);background:var(--surface);color:var(--ink-2);border-radius:8px;
+  padding:7px 11px;font-size:12px;cursor:pointer}
+.note{background:var(--surface-2);border:1px solid var(--border);border-left:3px solid var(--warn);
+  border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--ink-2);margin:14px 0}
+.note b{color:var(--ink)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
+.kpi .l{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.kpi .v{font-size:25px;font-weight:600;margin-top:4px;letter-spacing:-.5px}
+.kpi .d{font-size:11px;color:var(--muted);margin-top:2px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:8px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px 8px;box-shadow:var(--shadow);min-width:0}
+.card h3{font-size:13.5px;margin-bottom:2px}
+.card .cap{font-size:11.5px;color:var(--muted);margin-bottom:6px}
+.chart{width:100%;height:280px}
+.chart.tall{height:330px}
+.chart.heat{height:300px}
+.c12{grid-column:span 12}.c8{grid-column:span 8}.c6{grid-column:span 6}.c4{grid-column:span 4}.c7{grid-column:span 7}.c5{grid-column:span 5}
+.sec{grid-column:span 12;margin-top:14px;padding-bottom:2px;border-bottom:2px solid var(--border)}
+.sec h2{font-size:15px;color:var(--accent)}
+.sec p{font-size:12px;color:var(--muted);margin:3px 0 0}
+table.foco{width:100%;border-collapse:collapse;font-size:12px}
+table.foco th,table.foco td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--border)}
+table.foco th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase}
+.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.pill.crit{background:color-mix(in srgb,var(--crit) 15%,transparent);color:var(--crit)}
+.pill.warn{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.pill.good{background:color-mix(in srgb,var(--good) 15%,transparent);color:var(--good)}
+.findings{display:grid;grid-template-columns:1fr;gap:10px}
+.find{border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--surface-2)}
+.find .hd{display:flex;gap:8px;align-items:center;margin-bottom:4px}
+.find h4{margin:0;font-size:13px}
+.find p{margin:2px 0 0;font-size:12.5px;color:var(--ink-2)}
+.dict{font-size:12px;color:var(--ink-2)}
+.dict dt{font-weight:600;color:var(--ink);margin-top:6px}
+.foot{grid-column:span 12;color:var(--muted);font-size:11.5px;margin-top:20px;border-top:1px solid var(--border);padding-top:12px}
+@media(max-width:920px){
+ .wrap{grid-template-columns:1fr}
+ .side{position:relative;height:auto;border-right:none;border-bottom:1px solid var(--border)}
+ .c8,.c6,.c7,.c5,.c4{grid-column:span 12}
+}
+</style>
+
+<div class="wrap">
+  <aside class="side">
+    <div class="brand">
+      <div class="dot">CT</div>
+      <div><h1>CESFAM Tongoy</h1><span>Producción asistencial</span></div>
+    </div>
+    <div class="sub">Panel interactivo · jul 2025 – jun 2026</div>
+    <div class="fbar">
+      <button class="btn primary" id="clearBtn">Limpiar filtros</button>
+      <button class="btn" id="csvBtn">Descargar CSV</button>
+    </div>
+    <div id="filters"></div>
+  </aside>
+
+  <main class="main">
+    <div class="top">
+      <div>
+        <h2>Análisis de producción — CESFAM Tongoy</h2>
+        <p>Prestaciones registradas entre julio 2025 y junio 2026. Fuente: registro institucional de prestaciones (REM/estadística local), datos anonimizados. Todos los indicadores se recalculan con los filtros del panel izquierdo.</p>
+      </div>
+      <button class="theme-t" id="themeBtn">◐ Tema</button>
+    </div>
+
+    <div class="note">
+      <b>Advertencias metodológicas.</b> Los recuentos son <b>registros de prestación</b> (una atención genera varias filas). <b>Prestaciones</b> = suma de Cantidad; <b>Personas</b> = identificadores únicos anonimizados (no equivalen a población inscrita). La <b>duración</b> se calcula solo para atenciones válidas (0–240 min); 7,7% de las filas tienen cierre anterior al inicio y se excluyen del cálculo. <b>Programa</b> y <b>Sector</b> tienen alta ausencia de registro (70%). Estas cifras reflejan <b>actividad registrada</b>, no necesidad ni cobertura poblacional.
+    </div>
+
+    <div class="kpis" id="kpis"></div>
+
+    <div class="grid">
+      <div class="sec"><h2>1 · Evolución temporal</h2><p>¿Cómo se distribuye la actividad en el tiempo? Los meses respetan el orden cronológico del período.</p></div>
+      <div class="card c8"><h3>Actividad mensual</h3><div class="cap">Registros, atenciones y personas por mes</div><div id="ch_mes" class="chart"></div></div>
+      <div class="card c4"><h3>Día de la semana</h3><div class="cap">Registros por día</div><div id="ch_dow" class="chart"></div></div>
+
+      <div class="sec"><h2>2 · Análisis horario</h2><p>Prioritario. Identifica horarios punta, horarios valle y focos críticos inversos (baja actividad en jornada hábil).</p></div>
+      <div class="card c7"><h3>Mapa de calor — Día × Hora</h3><div class="cap">Intensidad de registros; más oscuro = más actividad</div><div id="ch_heat" class="chart heat"></div></div>
+      <div class="card c5"><h3>Franja horaria</h3><div class="cap">Registros por bloque horario</div><div id="ch_franja" class="chart heat"></div></div>
+      <div class="card c6"><h3>Distribución por hora de inicio</h3><div class="cap">Registros según hora del día</div><div id="ch_hora" class="chart"></div></div>
+      <div class="card c6"><h3>Focos críticos inversos</h3><div class="cap">Celdas día×franja de jornada hábil con menor actividad registrada</div><div id="tbl_foco" style="max-height:280px;overflow:auto"></div></div>
+
+      <div class="sec"><h2>3 · Edad y curso de vida</h2><p>La edad proviene de "Edad a la Atención" (dato observado). ¿Qué grupos se atienden y en qué horario?</p></div>
+      <div class="card c5"><h3>Grupo etario</h3><div class="cap">Registros por tramo de edad</div><div id="ch_edad" class="chart"></div></div>
+      <div class="card c7"><h3>Curso de vida × Hora</h3><div class="cap">% dentro de cada grupo (a qué hora se atiende cada curso de vida)</div><div id="ch_edadhora" class="chart heat"></div></div>
+
+      <div class="sec"><h2>4 · Demografía y equidad</h2><p>Participaciones internas (no tasas poblacionales). Diferencias descriptivas, no inequidades confirmadas.</p></div>
+      <div class="card c4"><h3>Sexo</h3><div class="cap">Distribución de registros</div><div id="ch_sexo" class="chart"></div></div>
+      <div class="card c4"><h3>Género social</h3><div class="cap">Registro del campo (alta no revelación)</div><div id="ch_gs" class="chart"></div></div>
+      <div class="card c4"><h3>País de origen</h3><div class="cap">Registros (incluye "No informado")</div><div id="ch_pais" class="chart"></div></div>
+      <div class="card c6"><h3>Sector</h3><div class="cap">Territorio de referencia</div><div id="ch_sector" class="chart"></div></div>
+      <div class="card c6"><h3>Centro del paciente</h3><div class="cap">Centro de inscripción/procedencia</div><div id="ch_centro" class="chart"></div></div>
+
+      <div class="sec"><h2>5 · Profesionales y programas</h2><p>Análisis por estamento (nunca por profesional individual). Concentración de la cartera de prestaciones.</p></div>
+      <div class="card c6"><h3>Estamento profesional</h3><div class="cap">Registros por tipo de profesional</div><div id="ch_prof" class="chart tall"></div></div>
+      <div class="card c6"><h3>Programa</h3><div class="cap">Registros por programa (excluye "No informado" del ranking visual)</div><div id="ch_prog" class="chart tall"></div></div>
+      <div class="card c12"><h3>Pareto de prestaciones</h3><div class="cap">Prestaciones más frecuentes y % acumulado (regla 80/20)</div><div id="ch_pareto" class="chart tall"></div></div>
+
+      <div class="sec"><h2>6 · Duración de la atención</h2><p>Solo atenciones únicas con duración válida (0–240 min). No interpretar mayor duración como mejor atención.</p></div>
+      <div class="card c6"><h3>Distribución de duración</h3><div class="cap">Minutos por atención válida</div><div id="ch_dur" class="chart"></div></div>
+      <div class="card c6"><h3>Duración mediana por estamento</h3><div class="cap">Minutos (nivel atención)</div><div id="ch_durprof" class="chart"></div></div>
+
+      <div class="sec"><h2>7 · Calidad de datos, hallazgos y diccionario</h2></div>
+      <div class="card c6"><h3>Indicadores de calidad de datos</h3><div class="cap">Sobre el total del período</div><div id="qual"></div></div>
+      <div class="card c6"><h3>Hallazgos y recomendaciones prioritarias</h3><div class="cap">Vinculados a la evidencia del panel</div><div class="findings" id="finds"></div></div>
+      <div class="card c12"><h3>Diccionario de variables</h3><dl class="dict" id="dict"></dl></div>
+
+      <div class="foot" id="foot"></div>
+    </div>
+  </main>
+</div>
+
+<script>/*__ECHARTS__*/</script>
+<script>const DATA=/*__DATA__*/;</script>
+<script>
+"use strict";
+const $=s=>document.querySelector(s), cats=DATA.cats, N=DATA.meta.n;
+const fmt=n=>n.toLocaleString('es-CL');
+const MESlab=cats.mes.map(m=>({'01':'Ene','02':'Feb','03':'Mar','04':'Abr','05':'May','06':'Jun','07':'Jul','08':'Ago','09':'Sep','10':'Oct','11':'Nov','12':'Dic'}[m.slice(5)]+' '+m.slice(2,4)));
+
+/* ---- Filter dimensions: key -> {col, cats, label} ---- */
+const DIMS=[
+ {k:'mes',col:'mes',cats:MESlab,label:'Mes'},
+ {k:'dow',col:'dow',cats:['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'],label:'Día de semana'},
+ {k:'fr',col:'fr',cats:cats.franja,label:'Franja horaria'},
+ {k:'prof',col:'prof',cats:cats.prof,label:'Estamento'},
+ {k:'prog',col:'prog',cats:cats.prog,label:'Programa'},
+ {k:'desc',col:'desc',cats:cats.desc,label:'Prestación'},
+ {k:'ge',col:'ge',cats:cats.ge,label:'Grupo etario'},
+ {k:'sexo',col:'sexo',cats:cats.sexo,label:'Sexo'},
+ {k:'gs',col:'gs',cats:cats.gs,label:'Género social'},
+ {k:'pais',col:'pais',cats:cats.pais,label:'País de origen'},
+ {k:'sector',col:'sector',cats:cats.sector,label:'Sector'},
+ {k:'centro',col:'centro',cats:cats.centro,label:'Centro'},
+ {k:'emb',col:'emb',cats:cats.emb,label:'Embarazada'},
+];
+const F={}; DIMS.forEach(d=>F[d.k]=new Set());   // empty set = all
+
+/* ---- Precompute per-dim counts for filter labels (global) ---- */
+function globalCounts(col,ncat){const a=new Int32Array(ncat);const arr=DATA[col];for(let i=0;i<N;i++)a[arr[i]]++;return a;}
+
+/* ---- Build filter UI ---- */
+const fc=$('#filters');
+DIMS.forEach(d=>{
+  const gc=globalCounts(d.col,d.cats.length);
+  const g=document.createElement('div');g.className='fgroup'+(['desc','centro','pais','gs','sector','ge','emb'].includes(d.k)?' collapsed':'');
+  g.innerHTML=`<div class="h"><span>${d.label}</span><span class="cnt">todos</span></div><div class="opts"></div>`;
+  const opts=g.querySelector('.opts');
+  d.cats.forEach((c,i)=>{
+    const o=document.createElement('label');o.className='opt';
+    o.innerHTML=`<input type="checkbox" data-k="${d.k}" data-i="${i}"><span>${c}</span><span class="n">${fmt(gc[i]||0)}</span>`;
+    opts.appendChild(o);
+  });
+  g.querySelector('.h').onclick=e=>{if(e.target.tagName!=='INPUT')g.classList.toggle('collapsed');};
+  fc.appendChild(g);
+});
+fc.addEventListener('change',e=>{
+  const k=e.target.dataset.k,i=+e.target.dataset.i;
+  if(e.target.checked)F[k].add(i);else F[k].delete(i);
+  const grp=e.target.closest('.fgroup');grp.querySelector('.cnt').textContent=F[k].size?F[k].size+' sel.':'todos';
+  render();
+});
+
+/* ---- Filtering: returns Int32Array of passing indices ---- */
+function filtered(){
+  const active=DIMS.filter(d=>F[d.k].size>0);
+  const cols=active.map(d=>({arr:DATA[d.col],set:F[d.k]}));
+  const out=[];
+  for(let i=0;i<N;i++){let ok=true;
+    for(let j=0;j<cols.length;j++){if(!cols[j].set.has(cols[j].arr[i])){ok=false;break;}}
+    if(ok)out.push(i);}
+  return out;
+}
+/* aggregation helpers over index list */
+function countBy(idx,col,ncat){const a=new Float64Array(ncat);const arr=DATA[col];for(const i of idx)a[arr[i]]++;return a;}
+function sumQ(idx){let s=0;const q=DATA.q;for(const i of idx)s+=q[i];return s;}
+function uniq(idx,col){const s=new Set();const arr=DATA[col];for(const i of idx)s.add(arr[i]);return s.size;}
+
+/* ---- ECharts theme helpers ---- */
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function base(){return{textStyle:{fontFamily:'IBM Plex Sans, system-ui, sans-serif',color:css('--ink-2')},
+  grid:{left:8,right:14,top:24,bottom:8,containLabel:true},
+  tooltip:{backgroundColor:css('--surface'),borderColor:css('--border'),textStyle:{color:css('--ink')},confine:true}};}
+const AX=()=>({axisLine:{lineStyle:{color:css('--border')}},axisLabel:{color:css('--muted'),fontSize:11},
+  splitLine:{lineStyle:{color:css('--grid')}}});
+const PAL=()=>['--c0','--c1','--c2','--c3','--c4','--c5'].map(css);
+let charts={};
+function ec(id){if(charts[id])return charts[id];charts[id]=echarts.init($('#'+id),null,{renderer:'canvas'});return charts[id];}
+
+/* ---------- RENDER ---------- */
+function render(){
+  const idx=filtered();
+  const nreg=idx.length, npres=sumQ(idx), nper=uniq(idx,'pid'), nat=uniq(idx,'aten');
+  // KPIs
+  const kp=[
+    ['Registros de prestación',fmt(nreg),'filas'],
+    ['Prestaciones (Cantidad)',fmt(npres),'suma'],
+    ['Atenciones',fmt(nat),'eventos únicos'],
+    ['Personas',fmt(nper),'IDs anonimizados'],
+    ['Prestaciones / persona',nper?(npres/nper).toFixed(1):'–','promedio'],
+    ['Atenciones / persona',nper?(nat/nper).toFixed(1):'–','promedio'],
+  ];
+  $('#kpis').innerHTML=kp.map(k=>`<div class="kpi"><div class="l">${k[0]}</div><div class="v mono">${k[1]}</div><div class="d">${k[2]}</div></div>`).join('');
+
+  const P=PAL();
+  // Mensual (registros / atenciones / personas por mes)
+  {const nm=cats.mes.length;const reg=new Float64Array(nm),at=new Float64Array(nm);
+   const seenA=Array.from({length:nm},()=>new Set()),seenP=Array.from({length:nm},()=>new Set());
+   for(const i of idx){const m=DATA.mes[i];reg[m]++;seenA[m].add(DATA.aten[i]);seenP[m].add(DATA.pid[i]);}
+   ec('ch_mes').setOption({...base(),legend:{data:['Registros','Atenciones','Personas'],top:0,right:0,textStyle:{color:css('--muted'),fontSize:11}},
+    tooltip:{...base().tooltip,trigger:'axis'},
+    xAxis:{type:'category',data:MESlab,...AX(),axisLabel:{...AX().axisLabel,rotate:40}},
+    yAxis:{type:'value',...AX()},
+    series:[
+     {name:'Registros',type:'line',smooth:true,symbol:'circle',symbolSize:6,data:[...reg],lineStyle:{width:2.5,color:P[0]},itemStyle:{color:P[0]},areaStyle:{color:P[0]+'22'}},
+     {name:'Atenciones',type:'line',smooth:true,symbolSize:5,data:seenA.map(s=>s.size),lineStyle:{width:2,color:P[2]},itemStyle:{color:P[2]}},
+     {name:'Personas',type:'line',smooth:true,symbolSize:5,data:seenP.map(s=>s.size),lineStyle:{width:1.8,color:css('--muted'),type:'dashed'},itemStyle:{color:css('--muted')}},
+    ]},true);}
+  // DOW
+  {const a=countBy(idx,'dow',7);
+   ec('ch_dow').setOption({...base(),tooltip:{...base().tooltip,trigger:'axis'},
+    xAxis:{type:'category',data:['Lu','Ma','Mi','Ju','Vi','Sá','Do'],...AX()},yAxis:{type:'value',...AX()},
+    series:[{type:'bar',data:[...a].map((v,i)=>({value:v,itemStyle:{color:i<5?P[0]:P[1],borderRadius:[4,4,0,0]}})),barWidth:'62%'}]},true);}
+  // Heat dow x hora
+  {const m=[];for(let d=0;d<7;d++)for(let h=0;h<24;h++)m.push([h,d,0]);
+   const mp={};idx.forEach(i=>{const key=DATA.dow[i]*24+DATA.hora[i];mp[key]=(mp[key]||0)+1;});
+   let mx=1;m.forEach(c=>{c[2]=mp[c[1]*24+c[0]]||0;if(c[2]>mx)mx=c[2];});
+   ec('ch_heat').setOption({...base(),grid:{left:8,right:52,top:8,bottom:24,containLabel:true},
+    tooltip:{...base().tooltip,formatter:p=>`${['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'][p.value[1]]} ${p.value[0]}:00<br><b>${fmt(p.value[2])}</b> registros`},
+    xAxis:{type:'category',data:[...Array(24).keys()],...AX(),splitArea:{show:false},splitLine:{show:false}},
+    yAxis:{type:'category',data:['Lu','Ma','Mi','Ju','Vi','Sá','Do'],...AX(),splitLine:{show:false}},
+    visualMap:{min:0,max:mx,calculable:false,orient:'vertical',right:2,top:'center',itemHeight:120,
+      inRange:{color:[css('--surface-2'),P[0],'#0d2e46']},textStyle:{color:css('--muted'),fontSize:10}},
+    series:[{type:'heatmap',data:m,itemStyle:{borderColor:css('--surface'),borderWidth:1},progressive:0}]},true);}
+  // Franja
+  {const a=countBy(idx,'fr',cats.franja.length);
+   ec('ch_franja').setOption({...base(),grid:{left:8,right:40,top:8,bottom:8,containLabel:true},
+    tooltip:{...base().tooltip,trigger:'axis'},
+    xAxis:{type:'value',...AX()},yAxis:{type:'category',data:cats.franja,...AX(),inverse:true,axisLabel:{...AX().axisLabel,fontSize:10}},
+    series:[{type:'bar',data:[...a],itemStyle:{color:P[2],borderRadius:[0,4,4,0]},barWidth:'60%',
+      label:{show:true,position:'right',color:css('--muted'),fontSize:10,formatter:o=>fmt(o.value)}}]},true);}
+  // Hora
+  {const a=new Float64Array(24);for(const i of idx)a[DATA.hora[i]]++;
+   let pk=0;a.forEach((v,i)=>{if(v>a[pk])pk=i;});
+   ec('ch_hora').setOption({...base(),tooltip:{...base().tooltip,trigger:'axis'},
+    xAxis:{type:'category',data:[...Array(24).keys()],...AX()},yAxis:{type:'value',...AX()},
+    series:[{type:'bar',data:[...a].map((v,i)=>({value:v,itemStyle:{color:i===pk?P[3]:P[0],borderRadius:[3,3,0,0]}})),barWidth:'70%'}]},true);}
+  // Focos críticos inversos (dow x franja, jornada hábil)
+  {const jornada=[1,2,3,4,5],habiles=[0,1,2,3,4];
+   const cell={};idx.forEach(i=>{const k=DATA.dow[i]+'|'+DATA.fr[i];cell[k]=(cell[k]||0)+1;});
+   const rows=[];habiles.forEach(d=>jornada.forEach(f=>{rows.push({d,f,n:cell[d+'|'+f]||0});}));
+   rows.sort((a,b)=>a.n-b.n);
+   const DOW=['Lunes','Martes','Miércoles','Jueves','Viernes'];
+   const avg=rows.reduce((s,r)=>s+r.n,0)/rows.length||1;
+   $('#tbl_foco').innerHTML=`<table class="foco"><thead><tr><th>Día</th><th>Franja</th><th>Registros</th><th>vs prom.</th><th></th></tr></thead><tbody>`+
+     rows.slice(0,8).map(r=>{const ratio=r.n/avg;const cl=ratio<0.4?'crit':ratio<0.7?'warn':'good';
+       return `<tr><td>${DOW[r.d]}</td><td>${cats.franja[r.f]}</td><td class="mono">${fmt(r.n)}</td><td class="mono">${ratio.toFixed(2)}×</td><td><span class="pill ${cl}">${cl==='crit'?'crítico':cl==='warn'?'bajo':'normal'}</span></td></tr>`;}).join('')+`</tbody></table>`;}
+  // Edad grupo
+  {const a=countBy(idx,'ge',cats.ge.length);
+   ec('ch_edad').setOption({...base(),tooltip:{...base().tooltip,trigger:'axis'},
+    xAxis:{type:'category',data:cats.ge,...AX(),axisLabel:{...AX().axisLabel,fontSize:10,rotate:0}},yAxis:{type:'value',...AX()},
+    series:[{type:'bar',data:[...a],itemStyle:{color:P[0],borderRadius:[3,3,0,0]},barWidth:'66%'}]},true);}
+  // curso vida x hora (% fila)
+  {const CV=['Infancia (0–9)','Adolescencia (10–19)','Juventud (20–24)','Persona adulta (25–64)','Persona mayor (65+)'];
+   function cv(g){return g<=1?0:g<=3?1:g===4?2:g<=6?3:4;} // ge index -> curso vida
+   const m=Array.from({length:5},()=>new Float64Array(24));
+   for(const i of idx){m[cv(DATA.ge[i])][DATA.hora[i]]++;}
+   const data=[];let mx=0;
+   for(let r=0;r<5;r++){const tot=m[r].reduce((s,v)=>s+v,0)||1;for(let h=0;h<24;h++){const pct=m[r][h]/tot*100;data.push([h,r,+pct.toFixed(1)]);if(pct>mx)mx=pct;}}
+   ec('ch_edadhora').setOption({...base(),grid:{left:8,right:52,top:8,bottom:24,containLabel:true},
+    tooltip:{...base().tooltip,formatter:p=>`${CV[p.value[1]]} · ${p.value[0]}:00<br><b>${p.value[2]}%</b> de su grupo`},
+    xAxis:{type:'category',data:[...Array(24).keys()],...AX(),splitLine:{show:false}},
+    yAxis:{type:'category',data:['0–9','10–19','20–24','25–64','65+'],...AX(),splitLine:{show:false}},
+    visualMap:{min:0,max:Math.ceil(mx),right:2,top:'center',itemHeight:110,calculable:false,
+      inRange:{color:[css('--surface-2'),P[2],'#08403a']},textStyle:{color:css('--muted'),fontSize:10}},
+    series:[{type:'heatmap',data,itemStyle:{borderColor:css('--surface'),borderWidth:1}}]},true);}
+  // Sexo doughnut
+  {const a=countBy(idx,'sexo',cats.sexo.length);
+   ec('ch_sexo').setOption({...base(),tooltip:{...base().tooltip,trigger:'item',formatter:p=>`${p.name}: <b>${fmt(p.value)}</b> (${p.percent}%)`},
+    legend:{bottom:0,textStyle:{color:css('--muted'),fontSize:11}},
+    series:[{type:'pie',radius:['45%','70%'],center:['50%','45%'],data:cats.sexo.map((c,i)=>({name:c,value:a[i]})),
+      itemStyle:{borderColor:css('--surface'),borderWidth:2},label:{show:false},color:[P[2],P[0],P[1]]}]},true);}
+  // género social
+  hbar('ch_gs','gs',P[4]);
+  // país (bar)
+  hbar('ch_pais','pais',P[1]);
+  // sector
+  hbar('ch_sector','sector',P[0]);
+  // centro
+  hbar('ch_centro','centro',P[2]);
+  // estamento
+  hbar('ch_prof','prof',P[0],true);
+  // programa (excluir No informado)
+  hbar('ch_prog','prog',P[5],true,'No informado');
+  // Pareto
+  {const a=countBy(idx,'desc',cats.desc.length);
+   let order=[...a.keys()].sort((x,y)=>a[y]-a[x]).filter(i=>cats.desc[i]!=='Otras').slice(0,15);
+   const tot=[...a].reduce((s,v)=>s+v,0)||1;let cum=0;const cumd=[];const vals=order.map(i=>a[i]);
+   vals.forEach(v=>{cum+=v;cumd.push(+(cum/tot*100).toFixed(1));});
+   ec('ch_pareto').setOption({...base(),grid:{left:8,right:44,top:20,bottom:8,containLabel:true},
+    tooltip:{...base().tooltip,trigger:'axis'},legend:{data:['Registros','% acum.'],top:0,right:40,textStyle:{color:css('--muted'),fontSize:11}},
+    xAxis:{type:'category',data:order.map(i=>cats.desc[i]),...AX(),axisLabel:{...AX().axisLabel,rotate:40,fontSize:9,width:120,overflow:'truncate'}},
+    yAxis:[{type:'value',...AX()},{type:'value',max:100,...AX(),axisLabel:{...AX().axisLabel,formatter:'{value}%'},splitLine:{show:false}}],
+    series:[{name:'Registros',type:'bar',data:vals,itemStyle:{color:P[2],borderRadius:[3,3,0,0]},barWidth:'55%'},
+      {name:'% acum.',type:'line',yAxisIndex:1,data:cumd,lineStyle:{color:P[3],width:2},itemStyle:{color:P[3]},symbolSize:5}]},true);}
+  // Duración histograma
+  {const bins=[0,10,20,30,40,50,60,90,120,180,240];const lab=[];for(let i=0;i<bins.length-1;i++)lab.push(bins[i]+'–'+bins[i+1]);
+   const a=new Float64Array(bins.length-1);const d=DATA.dur;
+   for(const i of idx){const v=d[i];if(v<0)continue;for(let b=0;b<bins.length-1;b++){if(v>bins[b]&&v<=bins[b+1]){a[b]++;break;}}}
+   ec('ch_dur').setOption({...base(),tooltip:{...base().tooltip,trigger:'axis'},
+    xAxis:{type:'category',data:lab,...AX(),axisLabel:{...AX().axisLabel,rotate:40,fontSize:9}},yAxis:{type:'value',...AX()},
+    series:[{type:'bar',data:[...a],itemStyle:{color:P[0],borderRadius:[3,3,0,0]},barWidth:'80%'}]},true);}
+  // Duración mediana por estamento
+  {const nprof=cats.prof.length;const arrs=Array.from({length:nprof},()=>[]);const d=DATA.dur;
+   for(const i of idx){const v=d[i];if(v>=0)arrs[DATA.prof[i]].push(v);}
+   const med=arrs.map(a=>{if(!a.length)return null;a.sort((x,y)=>x-y);const m=a.length>>1;return a.length%2?a[m]:(a[m-1]+a[m])/2;});
+   let order=[...med.keys()].filter(i=>med[i]!==null).sort((x,y)=>med[x]-med[y]);
+   ec('ch_durprof').setOption({...base(),grid:{left:8,right:30,top:8,bottom:8,containLabel:true},
+    tooltip:{...base().tooltip,trigger:'axis'},
+    xAxis:{type:'value',...AX(),name:'min'},yAxis:{type:'category',data:order.map(i=>cats.prof[i]),...AX(),axisLabel:{...AX().axisLabel,fontSize:10}},
+    series:[{type:'bar',data:order.map(i=>med[i]),itemStyle:{color:P[2],borderRadius:[0,4,4,0]},barWidth:'62%',
+      label:{show:true,position:'right',color:css('--muted'),fontSize:10}}]},true);}
+}
+/* generic horizontal bar factory bound to current filtered index set */
+function makeHbar(idx){
+  return function(id,col,color,tall,exclude){
+    const nc=cats[col].length;const a=countBy(idx,col,nc);
+    let order=[...a.keys()].sort((x,y)=>a[y]-a[x]);
+    if(exclude)order=order.filter(i=>cats[col][i]!==exclude);
+    order=order.slice(0,tall?12:8).filter(i=>a[i]>0).reverse();
+    ec(id).setOption({...base(),grid:{left:8,right:36,top:8,bottom:8,containLabel:true},
+      tooltip:{...base().tooltip,trigger:'axis'},
+      xAxis:{type:'value',...AX()},yAxis:{type:'category',data:order.map(i=>cats[col][i]),...AX(),axisLabel:{...AX().axisLabel,fontSize:10,width:120,overflow:'truncate'}},
+      series:[{type:'bar',data:order.map(i=>a[i]),itemStyle:{color,borderRadius:[0,4,4,0]},barWidth:'64%',
+        label:{show:true,position:'right',color:css('--muted'),fontSize:10,formatter:o=>fmt(o.value)}}]},true);
+  };
+}
+/* patch render to inject hbar with idx */
+const _render=render;
+render=function(){const idx=filtered();hbar=makeHbar(idx);_render();};
+var hbar=makeHbar([]);
+
+/* Static panels */
+function statics(){
+  const Q=DATA.qual||{};
+  $('#qual').innerHTML=`<table class="foco"><tbody>
+   <tr><td>Registros del período</td><td class="mono">${fmt(DATA.qc.n)}</td></tr>
+   <tr><td>Registros fuera de período (jul-2026)</td><td class="mono">${fmt(DATA.qc.fuera)}</td><td><span class="pill warn">excluidos</span></td></tr>
+   <tr><td>Duplicados de fila exactos</td><td class="mono">${fmt(DATA.qc.dup)}</td></tr>
+   <tr><td>Duración negativa (cierre&lt;inicio)</td><td class="mono">${DATA.qc.durneg}%</td><td><span class="pill crit">registro</span></td></tr>
+   <tr><td>Cantidad ≤ 0</td><td class="mono">${fmt(DATA.qc.cant0)}</td></tr>
+   <tr><td>Programa "No informado"</td><td class="mono">${DATA.qc.prog}%</td><td><span class="pill crit">crítico</span></td></tr>
+   <tr><td>Sector "No informado"</td><td class="mono">${DATA.qc.sector}%</td><td><span class="pill crit">crítico</span></td></tr>
+   <tr><td>País "No informado"</td><td class="mono">${DATA.qc.pais}%</td><td><span class="pill warn">alto</span></td></tr>
+  </tbody></table>`;
+  const finds=[
+   ['crit','Subregistro de Programa y Sector','El 70% de los registros no consigna Programa ni Sector, lo que impide medir producción por programa y territorializar la demanda. Estandarizar registro obligatorio en RAYEN.'],
+   ['warn','Duración no confiable a nivel de prestación','7,7% de cierres anteriores al inicio y 21% > 4 h: el cierre corresponde al bloque, no a cada prestación. Usar duración solo a nivel de atención y auditar el registro horario.'],
+   ['good','Patrón horario bimodal definido','Concentración mañana 09–12 h y reinicio 14–16 h, con valle al mediodía y fin de semana casi sin actividad. Base para redistribuir agenda y evaluar extensión horaria vespertina.'],
+   ['warn','Baja representación de adolescentes y jóvenes','Los tramos 10–24 años tienen baja participación en horario de mañana; evaluar barreras de acceso (jornada escolar/laboral) — hipótesis a validar localmente.'],
+  ];
+  $('#finds').innerHTML=finds.map(f=>`<div class="find"><div class="hd"><span class="pill ${f[0]}">${f[0]==='crit'?'Crítico':f[0]==='warn'?'Alto':'Hallazgo'}</span><h4>${f[1]}</h4></div><p>${f[2]}</p></div>`).join('');
+  const dic=[
+   ['Registro de prestación','Cada fila. Una atención puede generar varias prestaciones (p. ej. odontología).'],
+   ['Prestación','Actividad realizada; volumen = suma de la columna Cantidad.'],
+   ['Atención','Evento único: misma persona, fecha y horario de apertura/cierre.'],
+   ['Persona','Identificador anonimizado (hash irreversible de IDKEY). No equivale a población inscrita.'],
+   ['Franja horaria','Bloque de la hora de inicio: madrugada, inicio, mañana, mediodía, tarde, cierre extendido, noche.'],
+   ['Duración','Hora de cierre − hora de inicio, válida solo entre 0 y 240 min, a nivel de atención.'],
+   ['Foco crítico inverso','Combinación día×franja de jornada hábil con actividad registrada muy inferior al promedio.'],
+   ['No informado','Campo sin dato, o codificado como "NO INFORMADO"/"Sin definir". Se conserva como categoría.'],
+  ];
+  $('#dict').innerHTML=dic.map(d=>`<dt>${d[0]}</dt><dd>${d[1]}</dd>`).join('');
+  $('#foot').innerHTML=`Fuente: registro institucional de prestaciones CESFAM Tongoy, período ${DATA.meta.periodo}. Datos anonimizados (sin nombres ni identificadores). Las cifras corresponden a actividad registrada y no representan cobertura ni necesidad poblacional. Uso interno de gestión — almacenar en repositorio institucional seguro conforme a la Ley 19.628 sobre protección de datos personales.`;
+}
+
+/* CSV download of filtered data.
+   Usa la capacidad 'downloads' del Artifact si está disponible; si no (archivo
+   offline abierto localmente), recurre a descarga por Blob. */
+function buildCSV(){
+  const idx=filtered();
+  const head=['mes','dia_semana','hora','franja','estamento','programa','prestacion','grupo_etario','sexo','genero_social','pais','sector','centro','embarazada','cantidad','duracion_min'];
+  const dow=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+  let out=head.join(';')+'\n';
+  for(const i of idx){const r=[MESlab[DATA.mes[i]],dow[DATA.dow[i]],DATA.hora[i],cats.franja[DATA.fr[i]],cats.prof[DATA.prof[i]],cats.prog[DATA.prog[i]],cats.desc[DATA.desc[i]],cats.ge[DATA.ge[i]],cats.sexo[DATA.sexo[i]],cats.gs[DATA.gs[i]],cats.pais[DATA.pais[i]],cats.sector[DATA.sector[i]],cats.centro[DATA.centro[i]],cats.emb[DATA.emb[i]],DATA.q[i],DATA.dur[i]<0?'':DATA.dur[i]];
+    out+=r.map(x=>(''+x).includes(';')?'"'+x+'"':x).join(';')+'\n';}
+  return "﻿"+out;
+}
+let _downloads;try{if(window.claude&&claude.use)claude.use('downloads').then(d=>_downloads=d).catch(()=>{});}catch(e){}
+$('#csvBtn').onclick=async()=>{
+  const data=buildCSV();
+  if(_downloads){
+    try{await _downloads.save({filename:'cesfam_tongoy_filtrado.csv',data});return;}
+    catch(e){ if(e&&e.code==='extension_not_enabled'){
+        try{await _downloads.save({filename:'cesfam_tongoy_filtrado.txt',data});return;}catch(e2){}
+      } else if(e&&e.code==='declined'){return;} }
+  }
+  const blob=new Blob([data],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='cesfam_tongoy_filtrado.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+};
+
+/* Clear */
+$('#clearBtn').onclick=()=>{DIMS.forEach(d=>F[d.k].clear());
+  document.querySelectorAll('#filters input').forEach(c=>c.checked=false);
+  document.querySelectorAll('.fgroup .cnt').forEach(c=>c.textContent='todos');render();};
+
+/* Theme toggle */
+$('#themeBtn').onclick=()=>{const r=document.documentElement;
+  const cur=r.getAttribute('data-theme')|| (matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  r.setAttribute('data-theme',cur==='dark'?'light':'dark');
+  Object.values(charts).forEach(c=>c.dispose());charts={};render();};
+
+addEventListener('resize',()=>Object.values(charts).forEach(c=>c.resize()));
+statics();render();
+</script>
